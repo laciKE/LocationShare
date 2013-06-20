@@ -1,0 +1,41 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_my_location"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:title="@string/my_location"/>
+    
+     <item
+        android:id="@+id/action_save_track"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:icon="@drawable/ic_menu_save_track"
+        android:title="@string/save_track"/>
+    
+    
+     <item
+        android:id="@+id/action_layers"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:icon="@drawable/ic_menu_layers"
+        android:title="@string/layers"/>
+    
+    <item
+        android:id="@+id/action_my_friends"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_menu_friends"
+        android:title="@string/my_friends"/>
+    
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/settings"/>
+    
+    
+
+</menu>

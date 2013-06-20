@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="pref_maps"
+        android:title="@string/maps" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_online_maps"
+            android:title="@string/use_online_maps" />
+
+        <ListPreference
+            android:defaultValue="@string/freemap_hiking"
+            android:dialogTitle="@string/choose_tile_source"
+            android:entries="@array/tile_sources"
+            android:entryValues="@array/tile_sources_values"
+            android:key="pref_tile_source"
+            android:title="@string/tile_source" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="pref_location_share"
+        android:title="@string/location_share" >
+        <EditTextPreference
+            android:key="pref_username"
+            android:title="@string/username" />
+        <EditTextPreference
+            android:inputType="textPassword"
+            android:key="pref_password"
+            android:title="@string/password" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
