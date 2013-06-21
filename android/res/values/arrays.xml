@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="freemap_hiking">FreemapSlovakiaHiking</string>
+    <string name="freemap_cyclemap">FreemapSlovakiaCycleMap</string>
+    <string name="freemap_caratlas">FreemapSlovakiaCarAtlas</string>
+    <string name="map1eu">Map1.eu</string>
+    <string name="osm_mapnik">OpenStreetMapMapnik</string>
+    <string name="osm_mapquest">OpenStreetMapMapQuest</string>
+    <string name="osm_cyclemap">OpenStreetMapCycleMap</string>
+
+    <string-array name="tile_sources_values">
+        <item>@string/freemap_hiking</item>
+        <item>@string/freemap_cyclemap</item>
+        <item>@string/freemap_caratlas</item>
+        <item>@string/map1eu</item>
+        <item>@string/osm_mapnik</item>
+        <item>@string/osm_mapquest</item>
+        <item>@string/osm_cyclemap</item>
+    </string-array>
+</resources>

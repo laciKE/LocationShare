@@ -4,9 +4,6 @@ import java.io.File;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -27,6 +24,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -43,6 +41,8 @@ public class MainActivity extends Activity implements TrackListener,
 	private MyLocationOverlay mLocationOverlay;
 	private PathOverlay mPathOverlay;
 	private GpxTrack mGpxTrack;
+	private IGeoPoint mMapCenter;
+	private int mMapZoom;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,21 +55,21 @@ public class MainActivity extends Activity implements TrackListener,
 		mMapView.setUseDataConnection(sharedPreferences.getBoolean(
 				SettingsActivity.PREF_ONLINE_MAPS, false));
 
-		final ITileSource tileSource = new XYTileSource(
-				"FreemapSlovakiaHiking", ResourceProxy.string.offline_mode, 9,
-				15, 256, ".png", "http://tiles.freemap.sk/T/");
-		mMapView.setTileSource(tileSource);
-		
+		String tileSourceName = sharedPreferences.getString(
+				SettingsActivity.PREF_TILE_SOURCE, this.getResources()
+						.getString(R.string.osm_mapnik));
+		mMapView.setTileSource(MyTileSourceFactory.createTileSource(
+				tileSourceName, this.getResources()));
+
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.setMultiTouchControls(true);
 		mMapController = mMapView.getController();
 
 		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
 				MODE_PRIVATE);
-		GeoPoint point = new GeoPoint(lastSession.getInt(LATITUDE, 48158210),
+		mMapCenter = new GeoPoint(lastSession.getInt(LATITUDE, 48158210),
 				lastSession.getInt(LONGITUDE, 17083310));
-		mMapController.setCenter(point);
-		mMapController.setZoom(lastSession.getInt(ZOOM, 14));
+		mMapZoom = lastSession.getInt(ZOOM, 14);
 
 		// ArrayList<OverlayItem> mItems = new ArrayList<OverlayItem>();
 		// OverlayItem oItem = new OverlayItem("laciKE", "my location", point);
@@ -103,14 +103,28 @@ public class MainActivity extends Activity implements TrackListener,
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		mMapController.setZoom(mMapZoom);
+		mMapController.setCenter(mMapCenter);
+		mMapCenter = mMapView.getMapCenter();
+	}
+
+	@Override
+	public void onPause() {
+		mMapCenter = mMapView.getMapCenter();
+		mMapZoom = mMapView.getZoomLevel();
+		super.onPause();
+	}
+
+	@Override
 	public void onDestroy() {
 		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
 				MODE_PRIVATE);
 		Editor editor = lastSession.edit();
-		editor.putInt(ZOOM, mMapView.getZoomLevel());
-		IGeoPoint mapCenter = mMapView.getMapCenter();
-		editor.putInt(LATITUDE, mapCenter.getLatitudeE6());
-		editor.putInt(LONGITUDE, mapCenter.getLongitudeE6());
+		editor.putInt(ZOOM, mMapZoom);
+		editor.putInt(LATITUDE, mMapCenter.getLatitudeE6());
+		editor.putInt(LONGITUDE, mMapCenter.getLongitudeE6());
 		editor.commit();
 
 		mLocationOverlay.disableCompass();
@@ -148,12 +162,10 @@ public class MainActivity extends Activity implements TrackListener,
 		case R.id.action_save_track:
 			mGpxTrack.saveGpxTrack(getStorageDirectory());
 			return true;
-		case R.id.action_layers:
-			// mMapView.setTileSource(TileSourceFactory.MAPNIK);
-			return true;
-		case R.id.action_my_friends:
-			// mMapView.setTileSource(TileSourceFactory.CYCLEMAP);
-			return true;
+//		case R.id.action_layers:
+//			return true;
+//		case R.id.action_my_friends:
+//			return true;
 		case R.id.action_settings:
 			showPreferences();
 			return true;
@@ -173,6 +185,13 @@ public class MainActivity extends Activity implements TrackListener,
 		if (key.equals(SettingsActivity.PREF_ONLINE_MAPS)) {
 			mMapView.setUseDataConnection(sharedPreferences.getBoolean(
 					SettingsActivity.PREF_ONLINE_MAPS, false));
+		}
+		if (key.equals(SettingsActivity.PREF_TILE_SOURCE)) {
+			String newValue = sharedPreferences.getString(
+					SettingsActivity.PREF_TILE_SOURCE, this.getResources()
+							.getString(R.string.osm_mapnik));
+			mMapView.setTileSource(MyTileSourceFactory.createTileSource(
+					newValue, this.getResources()));
 		}
 	}
 
