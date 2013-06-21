@@ -41,6 +41,14 @@ public class GpxTrack {
 	}
 
 	public void saveGpxTrack(final File directory) {
+		final int pointsCount = mTrackPoints.size();
+
+		if (pointsCount == 0) {
+			Toast.makeText(mContext,
+					"No GPX trackpoints have been recorded yet.",
+					Toast.LENGTH_LONG).show();
+			return;
+		}
 		Locale defaultLocale = Locale.getDefault();
 		Locale.setDefault(Locale.US);
 		TimeZone defaultTimeZone = TimeZone.getDefault();
@@ -48,8 +56,6 @@ public class GpxTrack {
 		final String gpxLog = RecordedRouteGPXFormatter.create(mTrackPoints);
 		TimeZone.setDefault(defaultTimeZone);
 		Locale.setDefault(defaultLocale);
-
-		final int pointsCount = mTrackPoints.size();
 
 		Thread writerThread = new Thread(new Runnable() {
 
