@@ -49,11 +49,11 @@ public class MainActivity extends Activity implements TrackListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		Intent intent = new Intent(this, LocationService.class);
 		intent.putExtra(LocationService.COMMAND, LocationService.COMMAND_START);
 		startService(intent);
-		
+
 		mMapView = (MapView) findViewById(R.id.mapview);
 
 		SharedPreferences sharedPreferences = PreferenceManager
@@ -94,12 +94,10 @@ public class MainActivity extends Activity implements TrackListener,
 
 		mLocationOverlay = new CustomMyLocationOverlay(this, mMapView, this);
 		mLocationOverlay.setLocationUpdateMinDistance(5);
-		mLocationOverlay.setLocationUpdateMinTime(500);
+		mLocationOverlay.setLocationUpdateMinTime(Long
+				.parseLong(sharedPreferences.getString(
+						SettingsActivity.PREF_UPDATE_FOREGROUND, "60000")));
 		mLocationOverlay.setDrawAccuracyEnabled(true);
-		mLocationOverlay.enableMyLocation();
-		mLocationOverlay.disableFollowLocation();
-		mLocationOverlay.enableCompass();
-		mLocationOverlay.setEnabled(true);
 		mMapView.getOverlays().add(mLocationOverlay);
 
 		ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(this);
@@ -113,13 +111,21 @@ public class MainActivity extends Activity implements TrackListener,
 		super.onResume();
 		mMapController.setZoom(mMapZoom);
 		mMapController.setCenter(mMapCenter);
-		mMapCenter = mMapView.getMapCenter();
+
+		mLocationOverlay.enableMyLocation();
+		mLocationOverlay.disableFollowLocation();
+		mLocationOverlay.enableCompass();
+		mLocationOverlay.setEnabled(true);
 	}
 
 	@Override
 	public void onPause() {
 		mMapCenter = mMapView.getMapCenter();
 		mMapZoom = mMapView.getZoomLevel();
+		mLocationOverlay.disableCompass();
+		mLocationOverlay.disableFollowLocation();
+		mLocationOverlay.disableMyLocation();
+		mLocationOverlay.setEnabled(false);
 		super.onPause();
 	}
 
@@ -133,10 +139,6 @@ public class MainActivity extends Activity implements TrackListener,
 		editor.putInt(LONGITUDE, mMapCenter.getLongitudeE6());
 		editor.commit();
 
-		mLocationOverlay.disableCompass();
-		mLocationOverlay.disableFollowLocation();
-		mLocationOverlay.disableMyLocation();
-		mLocationOverlay.setEnabled(false);
 		mPathOverlay.clearPath();
 		mGpxTrack.clear();
 		super.onDestroy();
@@ -177,7 +179,8 @@ public class MainActivity extends Activity implements TrackListener,
 			return true;
 		case R.id.action_exit:
 			Intent intent = new Intent(this, LocationService.class);
-			intent.putExtra(LocationService.COMMAND, LocationService.COMMAND_STOP);
+			intent.putExtra(LocationService.COMMAND,
+					LocationService.COMMAND_STOP);
 			startService(intent);
 			finish();
 			return true;
@@ -204,6 +207,11 @@ public class MainActivity extends Activity implements TrackListener,
 							.getString(R.string.osm_mapnik));
 			mMapView.setTileSource(MyTileSourceFactory.createTileSource(
 					newValue, this.getResources()));
+		}
+		if (key.equals(SettingsActivity.PREF_UPDATE_FOREGROUND)) {
+			long minTime = Long.parseLong(sharedPreferences.getString(
+					SettingsActivity.PREF_UPDATE_FOREGROUND, "60000"));
+			mLocationOverlay.setLocationUpdateMinTime(minTime);
 		}
 	}
 

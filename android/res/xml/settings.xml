@@ -28,7 +28,21 @@
             android:defaultValue="true"
             android:key="pref_gps_provider"
             android:title="@string/gps_provider" />
-        <!-- foreground and background interval -->
+
+        <ListPreference
+            android:defaultValue="@string/min1"
+            android:dialogTitle="@string/choose_time_interval"
+            android:entries="@array/time_intervals"
+            android:entryValues="@array/time_intervals_values"
+            android:key="pref_update_foreground"
+            android:title="@string/interval_foreground" />
+        <ListPreference
+            android:defaultValue="@string/min1"
+            android:dialogTitle="@string/choose_time_interval"
+            android:entries="@array/time_intervals"
+            android:entryValues="@array/time_intervals_values"
+            android:key="pref_update_background"
+            android:title="@string/interval_background" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_location_share"
@@ -52,7 +66,15 @@
             android:key="pref_livetracking_url"
             android:summary="@string/livetracking_url_summary"
             android:title="@string/livetracking_url" />
-        <!-- interval -->
+
+        <ListPreference
+            android:defaultValue="@string/min1"
+            android:dependency="pref_livetracking"
+            android:dialogTitle="@string/choose_time_interval"
+            android:entries="@array/time_intervals"
+            android:entryValues="@array/time_intervals_values"
+            android:key="pref_update_livetracking"
+            android:title="@string/interval_livetracking" />
     </PreferenceCategory>
 
 </PreferenceScreen>

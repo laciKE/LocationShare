@@ -28,7 +28,6 @@ public class LocationService extends Service implements
 	// string arguments for COMMAND
 	public final static String COMMAND_START = "start";
 	public final static String COMMAND_STOP = "stop";
-	public final static String COMMAND_GET_LOCATION = "get_location";
 	// commands with boolean argument
 	public final static String FOREGROUND_LISTENER = "foreground_listener";
 	public final static String PROVIDER_GPS = "gps_provider";
@@ -41,10 +40,16 @@ public class LocationService extends Service implements
 
 	// available broadcast intent commands
 	public final static String LOCATION_UPDATE = "location_update";
-	
+
 	private NotificationManager mNM;
 	private MyLocationManager mMyLocationManager;
 	private boolean mRequestStop = false;
+	private float mMinDistanceUpdate = 10;
+	private long mForegroundUpdate = 60 * 1000;
+	private long mBackgroundUpdate = 60 * 1000;
+	private long mLiveTrackingUpdate = 60 * 1000;
+	private boolean mLiveTrackingEnabled = false;
+	private boolean mForegroundUpdateEnabled = false;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -64,6 +69,7 @@ public class LocationService extends Service implements
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
+		updateLocationUpdates(false);
 		updateLocationProviders(sharedPreferences, false);
 
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -92,7 +98,6 @@ public class LocationService extends Service implements
 
 	@Override
 	public void onDestroy() {
-		Log.i("LocationService", "Received stop");
 		mMyLocationManager.disable();
 		// Cancel the persistent notification.
 		mNM.cancel(NOTIFICATION);
@@ -132,9 +137,7 @@ public class LocationService extends Service implements
 	 * Handles command from Activity.
 	 */
 	protected void handleCommand(Intent intent, int startId) {
-		// TODO
-		Log.i("LocationService", "Received start id " + startId + ": " + intent);
-		if(mRequestStop){
+		if (mRequestStop) {
 			stopSelf(startId);
 		}
 		if (COMMAND_STOP.equals(intent.getStringExtra(COMMAND))) {
@@ -142,6 +145,34 @@ public class LocationService extends Service implements
 		}
 		if (COMMAND_START.equals(intent.getStringExtra(COMMAND))) {
 			mMyLocationManager.enable();
+		}
+
+		if (intent.hasExtra(MIN_TIME_UPDATE)) {
+			mForegroundUpdate = intent.getLongExtra(MIN_TIME_UPDATE, 60 * 1000);
+		}
+		if (intent.hasExtra(MIN_DISTANCE_UPDATE)) {
+			mMinDistanceUpdate = intent.getFloatExtra(MIN_DISTANCE_UPDATE, 5);
+			mMyLocationManager.setMinDistance(mMinDistanceUpdate, false);
+		}
+		if (intent.hasExtra(FOREGROUND_LISTENER)) {
+			mForegroundUpdateEnabled = intent.getBooleanExtra(
+					FOREGROUND_LISTENER, false);
+			updateLocationUpdates(true);
+		}
+	}
+
+	protected void updateLocationUpdates(boolean updateListener) {
+		long updateInterval = mBackgroundUpdate;
+		if (mLiveTrackingEnabled) {
+			updateInterval = Math.min(updateInterval, mLiveTrackingUpdate);
+		}
+		if (mForegroundUpdateEnabled) {
+			updateInterval = Math.min(updateInterval, mForegroundUpdate);
+		}
+		mMyLocationManager.setMinTime(updateInterval, false);
+
+		if (updateListener) {
+			mMyLocationManager.updateLocationListener();
 		}
 	}
 
@@ -159,18 +190,26 @@ public class LocationService extends Service implements
 				mMyLocationManager.disableProvider(provider[1], false);
 			}
 		}
-		if (updateListener) {
-			mMyLocationManager.updateLocationListener();
-		}
+
+		mForegroundUpdate = Long.parseLong(sharedPreferences.getString(
+				SettingsActivity.PREF_UPDATE_FOREGROUND, "60000"));
+		mBackgroundUpdate = Long.parseLong(sharedPreferences.getString(
+				SettingsActivity.PREF_UPDATE_BACKGROUND, "60000"));
+		mLiveTrackingUpdate = Long.parseLong(sharedPreferences.getString(
+				SettingsActivity.PREF_UPDATE_LIVETRACKING, "60000"));
+		mLiveTrackingEnabled = sharedPreferences.getBoolean(
+				SettingsActivity.PREF_LIVETRACKING, false);
+
+		updateLocationUpdates(updateListener);
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO
 		Log.i("LocationService", location.toString());
 		SharedLocationStorage.getInstance().add(location);
 		Intent intent = new Intent(LOCATION_UPDATE);
-		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+		LocalBroadcastManager.getInstance(getApplicationContext())
+				.sendBroadcast(intent);
 	}
 
 	@Override
@@ -194,9 +233,13 @@ public class LocationService extends Service implements
 			String key) {
 		if (key.equals(SettingsActivity.PREF_GPS_PROVIDER)
 				|| key.equals(SettingsActivity.PREF_NETWORK_PROVIDER)) {
-			Log.i("LocationService", "sharedpref changed: " + key);
+			updateLocationProviders(sharedPreferences, true);
+		}
+		if (key.equals(SettingsActivity.PREF_LIVETRACKING)
+				|| key.equals(SettingsActivity.PREF_UPDATE_BACKGROUND)
+				|| key.equals(SettingsActivity.PREF_UPDATE_FOREGROUND)
+				|| key.equals(SettingsActivity.PREF_UPDATE_LIVETRACKING)) {
 			updateLocationProviders(sharedPreferences, true);
 		}
 	}
-
 }

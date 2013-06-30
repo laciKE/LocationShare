@@ -18,6 +18,10 @@
     <string name="location_providers">Location providers</string>
     <string name="network_provider">Network provider</string>
     <string name="gps_provider">GPS provider</string>
+    <string name="interval_foreground">Update interval in foreground mode</string>
+    <string name="interval_background">Update interval in background mode</string>
+    <string name="interval_livetracking">Update interval of live tracking</string>
+    <string name="choose_time_interval">Choose time interval</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="livetracking_enable">Enable live tracking</string>
@@ -32,6 +36,25 @@
         <item>OpenStreetMap Mapnik</item>
         <item>OpenStreetMap MapQuest</item>
         <item>OpenStreetMap Cycle Map</item>
+    </string-array>
+    
+    <string-array name="time_intervals">
+        <item> 0 sec</item>
+        <item> 1 sec</item>
+        <item> 5 sec</item>
+        <item>15 sec</item>
+        <item>30 sec</item>
+        <item> 1 min</item>
+        <item> 5 min</item>
+        <item>10 min</item>
+        <item>15 min</item>
+        <item>30 min</item>
+        <item> 1 hour</item>
+        <item> 2 hours</item>
+        <item> 3 hours</item>
+        <item> 6 hours</item>
+        <item>12  hours</item>
+        <item>24  hours</item>
     </string-array>
 
     <string name="service_started">Location Share background service is running.</string>

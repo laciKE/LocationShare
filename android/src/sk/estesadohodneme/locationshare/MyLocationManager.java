@@ -14,10 +14,11 @@ public class MyLocationManager {
 	private LocationManager mLocationManager;
 	private LocationListener mLocationListener;
 	private MyLocationListener mMyLocationListener;
-	private long mMinTime = 5 * 1000;
-	private float mMinDistance = 10;
+	private long mMinTime = 60 * 1000;
+	private float mMinDistance = 5;
 	private boolean mIsEnabled = false;
 	private HashSet<String> mEnabledProviders;
+	private Location mLastLocation = null;
 
 	public MyLocationManager(Context context,
 			MyLocationListener myLocationListener) {
@@ -52,6 +53,7 @@ public class MyLocationManager {
 			@Override
 			public void onLocationChanged(Location location) {
 				// TODO
+				mLastLocation = location;
 				mMyLocationListener.onLocationChanged(location);
 			}
 		};
@@ -64,7 +66,7 @@ public class MyLocationManager {
 		}
 	}
 
-	public void setMinDistance(long minDistance, boolean updateListener){
+	public void setMinDistance(float minDistance, boolean updateListener){
 		mMinDistance = minDistance;
 		if (updateListener) {
 			updateLocationListener();
@@ -97,7 +99,7 @@ public class MyLocationManager {
 
 	public void updateLocationListener() {
 		if (mIsEnabled) {
-			Log.i("MyLocationManager", "updateListener");
+			Log.i("MyLocationManager", "updateListener " + mMinTime);
 			mLocationManager.removeUpdates(mLocationListener);
 			for (String provider : mEnabledProviders) {
 				Log.i("MyLocationManager", "request updates from " + provider);

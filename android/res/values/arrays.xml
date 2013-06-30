@@ -17,4 +17,24 @@
         <item>@string/osm_mapquest</item>
         <item>@string/osm_cyclemap</item>
     </string-array>
+    
+    <string name="min1">60000</string>
+    <string-array name="time_intervals_values"> <!-- in ms -->
+        <item>0</item>
+        <item>1000</item>
+        <item>5000</item>
+        <item>15000</item>
+        <item>30000</item>
+        <item>@string/min1</item>
+        <item>300000</item>
+        <item>600000</item>
+        <item>900000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>7200000</item>
+        <item>10800000</item>
+        <item>21600000</item>
+        <item>43200000</item>
+        <item>86400000</item>
+    </string-array>
 </resources>

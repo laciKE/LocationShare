@@ -24,7 +24,6 @@ public class MyLocationListenerProxy extends LocationListenerProxy {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (mLocationListener != null) {
-					Log.i("LocProxy", intent.toString());
 					if(LocationService.LOCATION_UPDATE.equals(intent.getAction())){
 						Location location = SharedLocationStorage.getInstance().getLast();
 						mLocationListener.onLocationChanged(location);
@@ -46,7 +45,6 @@ public class MyLocationListenerProxy extends LocationListenerProxy {
 		intent.putExtra(LocationService.MIN_TIME_UPDATE, pUpdateTime);
 		intent.putExtra(LocationService.MIN_DISTANCE_UPDATE, pUpdateDistance);
 		mContext.startService(intent);
-		Log.i("LocProxy", intent.toString());
 
 		return true;
 	}
