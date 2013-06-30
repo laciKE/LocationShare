@@ -14,7 +14,7 @@ public class MyLocationManager {
 	private LocationManager mLocationManager;
 	private LocationListener mLocationListener;
 	private MyLocationListener mMyLocationListener;
-	private int mMinTime = 5 * 1000;
+	private long mMinTime = 5 * 1000;
 	private float mMinDistance = 10;
 	private boolean mIsEnabled = false;
 	private HashSet<String> mEnabledProviders;
@@ -56,7 +56,21 @@ public class MyLocationManager {
 			}
 		};
 	}
+	
+	public void setMinTime(long minTime, boolean updateListener){
+		mMinTime = minTime;
+		if (updateListener) {
+			updateLocationListener();
+		}
+	}
 
+	public void setMinDistance(long minDistance, boolean updateListener){
+		mMinDistance = minDistance;
+		if (updateListener) {
+			updateLocationListener();
+		}
+	}
+	
 	public void enableProvider(String provider, boolean updateListener) {
 		mEnabledProviders.add(provider);
 		if (updateListener) {

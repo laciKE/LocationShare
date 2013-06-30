@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,18 +22,29 @@ import android.widget.Toast;
  */
 public class LocationService extends Service implements
 		OnSharedPreferenceChangeListener, MyLocationListener {
+	// available commands
 	// commands with string argument
 	public final static String COMMAND = "command";
 	// string arguments for COMMAND
 	public final static String COMMAND_START = "start";
+	public final static String COMMAND_STOP = "stop";
 	public final static String COMMAND_GET_LOCATION = "get_location";
 	// commands with boolean argument
+	public final static String FOREGROUND_LISTENER = "foreground_listener";
 	public final static String PROVIDER_GPS = "gps_provider";
 	public final static String PROVIDER_NETWORK = "network_provider";
 	public final static String LIVETRACKING = "livetracking";
+	// commands with long argument
+	public final static String MIN_TIME_UPDATE = "min_time";
+	// commands with float argument
+	public final static String MIN_DISTANCE_UPDATE = "min_distance";
 
+	// available broadcast intent commands
+	public final static String LOCATION_UPDATE = "location_update";
+	
 	private NotificationManager mNM;
 	private MyLocationManager mMyLocationManager;
+	private boolean mRequestStop = false;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
@@ -122,6 +134,12 @@ public class LocationService extends Service implements
 	protected void handleCommand(Intent intent, int startId) {
 		// TODO
 		Log.i("LocationService", "Received start id " + startId + ": " + intent);
+		if(mRequestStop){
+			stopSelf(startId);
+		}
+		if (COMMAND_STOP.equals(intent.getStringExtra(COMMAND))) {
+			mRequestStop = true;
+		}
 		if (COMMAND_START.equals(intent.getStringExtra(COMMAND))) {
 			mMyLocationManager.enable();
 		}
@@ -150,7 +168,9 @@ public class LocationService extends Service implements
 	public void onLocationChanged(Location location) {
 		// TODO
 		Log.i("LocationService", location.toString());
-
+		SharedLocationStorage.getInstance().add(location);
+		Intent intent = new Intent(LOCATION_UPDATE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 
 	@Override
