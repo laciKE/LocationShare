@@ -11,6 +11,7 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -101,8 +102,8 @@ public class MainActivity extends Activity implements TrackListener,
 		mLocationOverlay.setEnabled(true);
 		mMapView.getOverlays().add(mLocationOverlay);
 
-		// ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(this);
-		// mMapView.getOverlays().add(scaleBarOverlay);
+		ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(this);
+		mMapView.getOverlays().add(scaleBarOverlay);
 
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
