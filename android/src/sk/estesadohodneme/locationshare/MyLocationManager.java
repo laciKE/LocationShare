@@ -52,27 +52,41 @@ public class MyLocationManager {
 
 			@Override
 			public void onLocationChanged(Location location) {
-				// TODO
-				mLastLocation = location;
-				mMyLocationListener.onLocationChanged(location);
+				if (mLastLocation == null) {
+					mLastLocation = location;
+					mMyLocationListener.onLocationChanged(location);
+					return;
+				}
+
+				long timeDelta = location.getTime() - mLastLocation.getTime();
+				float accuracyDelta = location.getAccuracy()
+						- mLastLocation.getAccuracy();
+				boolean isSignificantlyNewer = timeDelta > Math.max(mMinTime,
+						30 * 1000);
+				boolean isNewerAndMoreAccurate = (timeDelta > (mMinTime / 2))
+						&& (accuracyDelta < -50);
+				if (isSignificantlyNewer || isNewerAndMoreAccurate) {
+					mLastLocation = location;
+					mMyLocationListener.onLocationChanged(location);
+				}
 			}
 		};
 	}
-	
-	public void setMinTime(long minTime, boolean updateListener){
+
+	public void setMinTime(long minTime, boolean updateListener) {
 		mMinTime = minTime;
 		if (updateListener) {
 			updateLocationListener();
 		}
 	}
 
-	public void setMinDistance(float minDistance, boolean updateListener){
+	public void setMinDistance(float minDistance, boolean updateListener) {
 		mMinDistance = minDistance;
 		if (updateListener) {
 			updateLocationListener();
 		}
 	}
-	
+
 	public void enableProvider(String provider, boolean updateListener) {
 		mEnabledProviders.add(provider);
 		if (updateListener) {
@@ -108,6 +122,5 @@ public class MyLocationManager {
 			}
 		}
 	}
-
 
 }
