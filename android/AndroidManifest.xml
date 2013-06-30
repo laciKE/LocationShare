@@ -32,6 +32,8 @@
             android:name=".SettingsActivity"
             android:theme="@style/SettingsTheme" >
         </activity>
+
+        <service android:name=".LocationService" />
     </application>
 
 </manifest>

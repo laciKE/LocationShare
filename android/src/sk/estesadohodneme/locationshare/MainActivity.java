@@ -118,6 +118,14 @@ public class MainActivity extends Activity implements TrackListener,
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		Intent intent = new Intent(this, LocationService.class);
+		intent.putExtra(LocationService.COMMAND, LocationService.COMMAND_START);
+		startService(intent);
+	}
+
+	@Override
 	public void onDestroy() {
 		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
 				MODE_PRIVATE);
@@ -162,12 +170,17 @@ public class MainActivity extends Activity implements TrackListener,
 		case R.id.action_save_track:
 			mGpxTrack.saveGpxTrack(getStorageDirectory());
 			return true;
-//		case R.id.action_layers:
-//			return true;
-//		case R.id.action_my_friends:
-//			return true;
+			// case R.id.action_layers:
+			// return true;
+			// case R.id.action_my_friends:
+			// return true;
 		case R.id.action_settings:
 			showPreferences();
+			return true;
+		case R.id.action_exit:
+			Intent intent = new Intent(this, LocationService.class);
+			stopService(intent);
+			finish();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

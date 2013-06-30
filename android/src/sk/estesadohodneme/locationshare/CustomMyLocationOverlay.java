@@ -33,4 +33,5 @@ public class CustomMyLocationOverlay extends MyLocationOverlay {
 			mTrackListener.onNewTrackPoint(location);
 		}
 	}
+	
 }
