@@ -116,6 +116,13 @@ public class MainActivity extends Activity implements TrackListener,
 		mLocationOverlay.disableFollowLocation();
 		mLocationOverlay.enableCompass();
 		mLocationOverlay.setEnabled(true);
+		
+		SharedLocationStorage sharedLocationStorage = SharedLocationStorage.getInstance();
+		for(int i=0; i<sharedLocationStorage.size(); i++){
+			MyGeoPoint trackPoint = new MyGeoPoint(sharedLocationStorage.get(i));
+			mGpxTrack.add(trackPoint);
+			mPathOverlay.addPoint(trackPoint);
+		}
 	}
 
 	@Override
@@ -126,6 +133,9 @@ public class MainActivity extends Activity implements TrackListener,
 		mLocationOverlay.disableFollowLocation();
 		mLocationOverlay.disableMyLocation();
 		mLocationOverlay.setEnabled(false);
+
+		mPathOverlay.clearPath();
+		mGpxTrack.clear();
 		super.onPause();
 	}
 
@@ -139,8 +149,6 @@ public class MainActivity extends Activity implements TrackListener,
 		editor.putInt(LONGITUDE, mMapCenter.getLongitudeE6());
 		editor.commit();
 
-		mPathOverlay.clearPath();
-		mGpxTrack.clear();
 		super.onDestroy();
 	}
 

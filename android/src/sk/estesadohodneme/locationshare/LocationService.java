@@ -43,6 +43,8 @@ public class LocationService extends Service implements
 
 	private NotificationManager mNM;
 	private MyLocationManager mMyLocationManager;
+	private HttpConnectionManager mHttpConnectionManager;
+	private Location mLastLiveLocation;
 	private boolean mRequestStop = false;
 	private float mMinDistanceUpdate = 10;
 	private long mForegroundUpdate = 60 * 1000;
@@ -65,6 +67,7 @@ public class LocationService extends Service implements
 
 		mMyLocationManager = new MyLocationManager(getApplicationContext(),
 				this);
+		mHttpConnectionManager = new HttpConnectionManager();
 
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -210,6 +213,12 @@ public class LocationService extends Service implements
 		Intent intent = new Intent(LOCATION_UPDATE);
 		LocalBroadcastManager.getInstance(getApplicationContext())
 				.sendBroadcast(intent);
+		if (mLiveTrackingEnabled
+				&& ((mLastLiveLocation == null) || (location.getTime()
+						- mLastLiveLocation.getTime() > 0.9 * mLiveTrackingUpdate))) {
+			mLastLiveLocation = location;
+			mHttpConnectionManager.send(location);
+		}
 	}
 
 	@Override
