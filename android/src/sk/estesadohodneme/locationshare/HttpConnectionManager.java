@@ -79,7 +79,6 @@ public class HttpConnectionManager {
 	public void setUrl(String url) {
 		synchronized (this) {
 			mUrl = url;
-			Log.i("LIVETRACK", mUrl);
 		}
 	}
 
