@@ -17,8 +17,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
- * Based on examples at
- * http://developer.android.com/reference/android/app/Service.html.
+ * Background service listening for location updates, managing parameters
+ * changes of location updates and sending http update messages. Based on
+ * examples at http://developer.android.com/reference/android/app/Service.html.
+ * New locations are storing into the {@link SharedLocationStorage} and info
+ * about them are sending via broadcast intents.
  */
 public class LocationService extends Service implements
 		OnSharedPreferenceChangeListener, MyLocationListener {
@@ -72,7 +75,10 @@ public class LocationService extends Service implements
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 
-		updateLocationUpdates(false);
+		mHttpConnectionManager.setUrl(sharedPreferences.getString(
+				SettingsActivity.PREF_LIVETRACKING_URL, null));
+
+		updateLocationFrequency(false);
 		updateLocationProviders(sharedPreferences, false);
 
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -160,11 +166,17 @@ public class LocationService extends Service implements
 		if (intent.hasExtra(FOREGROUND_LISTENER)) {
 			mForegroundUpdateEnabled = intent.getBooleanExtra(
 					FOREGROUND_LISTENER, false);
-			updateLocationUpdates(true);
+			updateLocationFrequency(true);
 		}
 	}
 
-	protected void updateLocationUpdates(boolean updateListener) {
+	/**
+	 * Computes new interval between location updates.
+	 * 
+	 * @param updateListener
+	 *            if true, changes are processed immediately
+	 */
+	protected void updateLocationFrequency(boolean updateListener) {
 		long updateInterval = mBackgroundUpdate;
 		if (mLiveTrackingEnabled) {
 			updateInterval = Math.min(updateInterval, mLiveTrackingUpdate);
@@ -179,6 +191,16 @@ public class LocationService extends Service implements
 		}
 	}
 
+	/**
+	 * Updates parameters of the location providers: state of the providers and
+	 * frequencies of the location updates in foreground, background and
+	 * livetracking mode.
+	 * 
+	 * @param sharedPreferences
+	 *            {@link SharedPreferences} object for resolving new values
+	 * @param updateListener
+	 *            if true, changes are processed immediately
+	 */
 	protected void updateLocationProviders(SharedPreferences sharedPreferences,
 			boolean updateListener) {
 		String[][] providers = {
@@ -203,9 +225,16 @@ public class LocationService extends Service implements
 		mLiveTrackingEnabled = sharedPreferences.getBoolean(
 				SettingsActivity.PREF_LIVETRACKING, false);
 
-		updateLocationUpdates(updateListener);
+		updateLocationFrequency(updateListener);
 	}
 
+	/**
+	 * Listens for location updates from {@link MyLocationManager}, stores new
+	 * {@link Location} into the {@link SharedLocationStorage} and informs other
+	 * application components about it via broadcast intents. Also if
+	 * livetracking is enabled and it is time for new update, sends new
+	 * {@link Location} to the {@link HttpConnectionManager}.
+	 */
 	@Override
 	public void onLocationChanged(Location location) {
 		Log.i("LocationService", location.toString());
@@ -221,6 +250,9 @@ public class LocationService extends Service implements
 		}
 	}
 
+	/**
+	 * Informs user about status changes of the location providers.
+	 */
 	@Override
 	public void onStatusChanged(String provider, int status) {
 		CharSequence statusDescription = null;
@@ -237,6 +269,12 @@ public class LocationService extends Service implements
 				.show();
 	}
 
+	/**
+	 * Listens for changes in the {@link SharedPreferences} and if the change
+	 * are interesting, processes this change. <br>
+	 * Interesting changes are enabling or disabling location providers, changes
+	 * in location updates and livetracking url.
+	 */
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
@@ -249,6 +287,10 @@ public class LocationService extends Service implements
 				|| key.equals(SettingsActivity.PREF_UPDATE_FOREGROUND)
 				|| key.equals(SettingsActivity.PREF_UPDATE_LIVETRACKING)) {
 			updateLocationProviders(sharedPreferences, true);
+		}
+		if (key.equals(SettingsActivity.PREF_LIVETRACKING_URL)) {
+			mHttpConnectionManager.setUrl(sharedPreferences.getString(
+					SettingsActivity.PREF_LIVETRACKING_URL, null));
 		}
 	}
 }

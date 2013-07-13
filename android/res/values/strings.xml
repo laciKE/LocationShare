@@ -26,7 +26,7 @@
     <string name="password">Password</string>
     <string name="livetracking_enable">Enable live tracking</string>
     <string name="livetracking_url">URL for live tracking</string>
-    <string name="livetracking_url_summary">URL of remote live tracker with available parameters: {nick}, {lat}, {lon}, {alt}, {speed}, {time}.</string>
+    <string name="livetracking_url_summary">URL of remote live tracker with available parameters: {lat}, {lon}, {alt}, {speed}, {time}.</string>
     
     <string-array name="tile_sources">
         <item>Freemap Slovakia Hiking</item>

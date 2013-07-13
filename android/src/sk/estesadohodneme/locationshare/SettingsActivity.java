@@ -17,6 +17,7 @@ public class SettingsActivity extends PreferenceActivity {
 	public static final String PREF_UPDATE_FOREGROUND = "pref_update_foreground";
 	public static final String PREF_UPDATE_BACKGROUND = "pref_update_background";
 	public static final String PREF_LIVETRACKING = "pref_livetracking";
+	public static final String PREF_LIVETRACKING_URL = "pref_livetracking_url";
 	public static final String PREF_UPDATE_LIVETRACKING = "pref_update_livetracking";
 
 	/**

@@ -34,7 +34,9 @@ public class HttpConnectionManager {
 					while (!mQueue.isEmpty()) {
 						Message message = mQueue.peek();
 						HttpClient Client = new DefaultHttpClient();
-						// TODO mUrl
+						synchronized (this) {
+							// TODO mUrl							
+						}
 						String url = "http://nodla.wz.sk/livetracker/tracker.php?user=locationshare";
 						Location location = message.getLocation();
 						url += "&lat=" + location.getLatitude() + "&lon="
@@ -75,8 +77,9 @@ public class HttpConnectionManager {
 	}
 
 	public void setUrl(String url) {
-		synchronized (mUrl) {
+		synchronized (this) {
 			mUrl = url;
+			Log.i("LIVETRACK", mUrl);
 		}
 	}
 
