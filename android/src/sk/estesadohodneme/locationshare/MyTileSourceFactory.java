@@ -61,12 +61,12 @@ public class MyTileSourceFactory {
 
 			break;
 		case R.string.freemap_cyclemap:
-			tileSource = new XYTileSource("FreemapSlovakiaCycleMap",
+			tileSource = new XYTileSource("FreemapSlovakiaCyclo",
 					ResourceProxy.string.offline_mode, 6, 16, 256, ".png",
 					"http://tiles.freemap.sk/C/");
 			break;
 		case R.string.freemap_caratlas:
-			tileSource = new XYTileSource("FreemapSlovakiaCarAtlas",
+			tileSource = new XYTileSource("FreemapSlovakia",
 					ResourceProxy.string.offline_mode, 6, 16, 256, ".png",
 					"http://tiles.freemap.sk/A/");
 			break;
