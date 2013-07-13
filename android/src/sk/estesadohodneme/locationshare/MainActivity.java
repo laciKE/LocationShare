@@ -71,12 +71,6 @@ public class MainActivity extends Activity implements TrackListener,
 		mMapView.setMultiTouchControls(true);
 		mMapController = mMapView.getController();
 
-		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
-				MODE_PRIVATE);
-		mMapCenter = new GeoPoint(lastSession.getInt(LATITUDE, 48158210),
-				lastSession.getInt(LONGITUDE, 17083310));
-		mMapZoom = lastSession.getInt(ZOOM, 14);
-
 		// ArrayList<OverlayItem> mItems = new ArrayList<OverlayItem>();
 		// OverlayItem oItem = new OverlayItem("laciKE", "my location", point);
 		// Drawable marker = getResources().getDrawable(R.drawable.marker);
@@ -104,6 +98,16 @@ public class MainActivity extends Activity implements TrackListener,
 		mMapView.getOverlays().add(scaleBarOverlay);
 
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+	}
+	
+	@Override 
+	public void onStart(){
+		super.onStart();
+		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
+				MODE_PRIVATE);
+		mMapCenter = new GeoPoint(lastSession.getInt(LATITUDE, 48158210),
+				lastSession.getInt(LONGITUDE, 17083310));
+		mMapZoom = lastSession.getInt(ZOOM, 14);
 	}
 
 	@Override
@@ -140,7 +144,7 @@ public class MainActivity extends Activity implements TrackListener,
 	}
 
 	@Override
-	public void onDestroy() {
+	public void onStop() {
 		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
 				MODE_PRIVATE);
 		Editor editor = lastSession.edit();
@@ -149,7 +153,7 @@ public class MainActivity extends Activity implements TrackListener,
 		editor.putInt(LONGITUDE, mMapCenter.getLongitudeE6());
 		editor.commit();
 
-		super.onDestroy();
+		super.onStop();
 	}
 
 	@Override
