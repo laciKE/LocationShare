@@ -146,11 +146,13 @@ public class LocationService extends Service implements
 	 * Handles command from Activity.
 	 */
 	protected void handleCommand(Intent intent, int startId) {
+		Log.i("LocService", intent.toString() + " "+ startId);
 		if (mRequestStop) {
 			stopSelf(startId);
 		}
 		if (COMMAND_STOP.equals(intent.getStringExtra(COMMAND))) {
 			mRequestStop = true;
+			stopSelf(startId);
 		}
 		if (COMMAND_START.equals(intent.getStringExtra(COMMAND))) {
 			mMyLocationManager.enable();
@@ -209,7 +211,7 @@ public class LocationService extends Service implements
 				{ SettingsActivity.PREF_GPS_PROVIDER,
 						LocationManager.GPS_PROVIDER } };
 		for (String[] provider : providers) {
-			if (sharedPreferences.getBoolean(provider[0], true)) {
+			if (sharedPreferences.getBoolean(provider[0], false)) {
 				mMyLocationManager.enableProvider(provider[1], false);
 			} else {
 				mMyLocationManager.disableProvider(provider[1], false);

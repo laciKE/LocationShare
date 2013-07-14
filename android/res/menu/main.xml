@@ -12,15 +12,13 @@
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/save_track"/>
-
-    <!--
-     <item
+    <item
         android:id="@+id/action_layers"
+        android:icon="@drawable/ic_menu_layers"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:icon="@drawable/ic_menu_layers"
         android:title="@string/layers"/>
-    
+    <!--
     <item
         android:id="@+id/action_my_friends"
         android:orderInCategory="100"
