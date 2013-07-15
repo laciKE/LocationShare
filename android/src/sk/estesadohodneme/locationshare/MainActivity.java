@@ -18,7 +18,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends Activity implements 
+public class MainActivity extends Activity implements
 		OnSharedPreferenceChangeListener {
 	private static final String SESSION_PREFS = "SessionsFile";
 	private static final String LATITUDE = "latitude";
@@ -30,6 +30,8 @@ public class MainActivity extends Activity implements
 	private Overlays mOverlays;
 	private IGeoPoint mMapCenter;
 	private int mMapZoom;
+
+	private boolean mRequestExit = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +101,13 @@ public class MainActivity extends Activity implements
 		editor.putInt(LONGITUDE, mMapCenter.getLongitudeE6());
 		editor.commit();
 
+		if (mRequestExit) {
+			// stop LocationService
+			Intent intent = new Intent(this, LocationService.class);
+			intent.putExtra(LocationService.COMMAND,
+					LocationService.COMMAND_STOP);
+			startService(intent);
+		}
 		super.onStop();
 	}
 
@@ -131,10 +140,7 @@ public class MainActivity extends Activity implements
 			showPreferences();
 			return true;
 		case R.id.action_exit:
-			Intent intent = new Intent(this, LocationService.class);
-			intent.putExtra(LocationService.COMMAND,
-					LocationService.COMMAND_STOP);
-			startService(intent);
+			mRequestExit = true;
 			finish();
 			return true;
 		default:
