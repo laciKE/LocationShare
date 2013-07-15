@@ -9,7 +9,6 @@
     <string name="my_friends">My friends</string>
     <string name="layers">Layers</string>
     <string name="save_track">Save gpx track</string>
-    
     <string name="maps">Maps</string>
     <string name="use_online_maps">Use online maps</string>
     <string name="tile_source">Tile source</string>
@@ -26,8 +25,19 @@
     <string name="password">Password</string>
     <string name="livetracking_enable">Enable live tracking</string>
     <string name="livetracking_url">URL for live tracking</string>
-    <string name="livetracking_url_summary">URL of remote live tracker with available parameters: {nick}, {lat}, {lon}, {alt}, {speed}, {time}.</string>
-    
+    <string name="livetracking_url_summary">URL of remote live tracker with available parameters: {lat}, {lon}, {alt}, {speed}, {time}.</string>
+    <string name="livetracking_url_default">http://example.com/tracker.php?user={nick}&amp;lat={lat}&amp;lon={lon}&amp;alt={alt}&amp;speed={speed}&amp;timestamp={time}</string>
+    <string name="choose_visible_layers">Choose visible layers</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string-array name="overlays">
+        <item>My location</item>
+        <item>Friend\'s locations</item>
+        <item>Scale bar</item>
+        <item>Compass</item>
+        <item>Path</item>
+    </string-array>
     <string-array name="tile_sources">
         <item>Freemap Slovakia Hiking</item>
         <item>Freemap Slovakia Cycle Map</item>
@@ -37,7 +47,6 @@
         <item>OpenStreetMap MapQuest</item>
         <item>OpenStreetMap Cycle Map</item>
     </string-array>
-    
     <string-array name="time_intervals">
         <item> 0 sec</item>
         <item> 1 sec</item>
@@ -63,5 +72,4 @@
     <string name="out_of_service">out of service</string>
     <string name="temporarily_unavailable">temporarily unavailable</string>
 
-    
 </resources>

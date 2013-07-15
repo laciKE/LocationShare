@@ -21,11 +21,11 @@
         android:key="pref_location_providers"
         android:title="@string/location_providers" >
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="pref_network_provider"
             android:title="@string/network_provider" />
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="pref_gps_provider"
             android:title="@string/gps_provider" />
 
@@ -61,7 +61,7 @@
             android:title="@string/livetracking_enable" />
 
         <EditTextPreference
-            android:defaultValue="http://example.com/tracker.php?user={nick}&amp;lat={lat}&amp;lon={lon}&amp;alt={alt}&amp;speed={speed}&amp;timestamp={time}"
+            android:defaultValue="@string/livetracking_url_default"
             android:dependency="pref_livetracking"
             android:key="pref_livetracking_url"
             android:summary="@string/livetracking_url_summary"

@@ -52,6 +52,7 @@ public class MyLocationManager {
 
 			@Override
 			public void onLocationChanged(Location location) {
+				// Log.i("MyLocationManager", location.toString());
 				if (mLastLocation == null) {
 					mLastLocation = location;
 					mMyLocationListener.onLocationChanged(location);
@@ -61,7 +62,7 @@ public class MyLocationManager {
 				long timeDelta = location.getTime() - mLastLocation.getTime();
 				float accuracyDelta = location.getAccuracy()
 						- mLastLocation.getAccuracy();
-				boolean isSignificantlyNewer = timeDelta > Math.max(mMinTime,
+				boolean isSignificantlyNewer = timeDelta > Math.min(mMinTime,
 						30 * 1000);
 				boolean isNewerAndMoreAccurate = (timeDelta > (mMinTime / 2))
 						&& (accuracyDelta < -50);

@@ -2,48 +2,36 @@ package sk.estesadohodneme.locationshare;
 
 import java.io.File;
 
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.MyLocationOverlay;
-import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.PathOverlay;
-import org.osmdroid.views.overlay.ScaleBarOverlay;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends Activity implements TrackListener,
+public class MainActivity extends Activity implements
 		OnSharedPreferenceChangeListener {
 	private static final String SESSION_PREFS = "SessionsFile";
 	private static final String LATITUDE = "latitude";
 	private static final String LONGITUDE = "longitude";
 	private static final String ZOOM = "zoom";
 
-	private Handler mHandler = new Handler();
 	private MapController mMapController;
 	private MapView mMapView;
-	private MyLocationOverlay mLocationOverlay;
-	private PathOverlay mPathOverlay;
-	private GpxTrack mGpxTrack;
+	private Overlays mOverlays;
 	private IGeoPoint mMapCenter;
 	private int mMapZoom;
+
+	private boolean mRequestExit = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,39 +59,19 @@ public class MainActivity extends Activity implements TrackListener,
 		mMapView.setMultiTouchControls(true);
 		mMapController = mMapView.getController();
 
+		mOverlays = new Overlays(this, mMapView, sharedPreferences);
+
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
 				MODE_PRIVATE);
 		mMapCenter = new GeoPoint(lastSession.getInt(LATITUDE, 48158210),
 				lastSession.getInt(LONGITUDE, 17083310));
 		mMapZoom = lastSession.getInt(ZOOM, 14);
-
-		// ArrayList<OverlayItem> mItems = new ArrayList<OverlayItem>();
-		// OverlayItem oItem = new OverlayItem("laciKE", "my location", point);
-		// Drawable marker = getResources().getDrawable(R.drawable.marker);
-		// oItem.setMarker(marker);
-		// mItems.add(oItem);
-		// ItemizedIconOverlay<OverlayItem> mFriendsLocationOverlay = new
-		// ItemizedIconOverlay<OverlayItem>(
-		// this, mItems, null);
-		// mMapView.getOverlays().add(mFriendsLocationOverlay);
-
-		mGpxTrack = new GpxTrack(this, mHandler);
-
-		mPathOverlay = new PathOverlay(Color.CYAN, this);
-		mMapView.getOverlays().add(mPathOverlay);
-
-		mLocationOverlay = new CustomMyLocationOverlay(this, mMapView, this);
-		mLocationOverlay.setLocationUpdateMinDistance(5);
-		mLocationOverlay.setLocationUpdateMinTime(Long
-				.parseLong(sharedPreferences.getString(
-						SettingsActivity.PREF_UPDATE_FOREGROUND, "60000")));
-		mLocationOverlay.setDrawAccuracyEnabled(true);
-		mMapView.getOverlays().add(mLocationOverlay);
-
-		ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(this);
-		mMapView.getOverlays().add(scaleBarOverlay);
-
-		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
@@ -112,25 +80,19 @@ public class MainActivity extends Activity implements TrackListener,
 		mMapController.setZoom(mMapZoom);
 		mMapController.setCenter(mMapCenter);
 
-		mLocationOverlay.enableMyLocation();
-		mLocationOverlay.disableFollowLocation();
-		mLocationOverlay.enableCompass();
-		mLocationOverlay.setEnabled(true);
+		mOverlays.onResume();
 	}
 
 	@Override
 	public void onPause() {
 		mMapCenter = mMapView.getMapCenter();
 		mMapZoom = mMapView.getZoomLevel();
-		mLocationOverlay.disableCompass();
-		mLocationOverlay.disableFollowLocation();
-		mLocationOverlay.disableMyLocation();
-		mLocationOverlay.setEnabled(false);
+		mOverlays.onPause();
 		super.onPause();
 	}
 
 	@Override
-	public void onDestroy() {
+	public void onStop() {
 		SharedPreferences lastSession = getSharedPreferences(SESSION_PREFS,
 				MODE_PRIVATE);
 		Editor editor = lastSession.edit();
@@ -139,9 +101,14 @@ public class MainActivity extends Activity implements TrackListener,
 		editor.putInt(LONGITUDE, mMapCenter.getLongitudeE6());
 		editor.commit();
 
-		mPathOverlay.clearPath();
-		mGpxTrack.clear();
-		super.onDestroy();
+		if (mRequestExit) {
+			// stop LocationService
+			Intent intent = new Intent(this, LocationService.class);
+			intent.putExtra(LocationService.COMMAND,
+					LocationService.COMMAND_STOP);
+			startService(intent);
+		}
+		super.onStop();
 	}
 
 	@Override
@@ -152,36 +119,28 @@ public class MainActivity extends Activity implements TrackListener,
 	}
 
 	@Override
-	public void onNewTrackPoint(Location location) {
-		MyGeoPoint trackPoint = new MyGeoPoint(location);
-		mGpxTrack.add(trackPoint);
-		mPathOverlay.addPoint(trackPoint);
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 
 		case R.id.action_my_location:
 			// mMapController.zoomInFixing(mLocationOverlay.getMyLocation());
 			// mMapController.animateTo(mLocationOverlay.getMyLocation());
-			mLocationOverlay.enableFollowLocation();
+			mOverlays.enableFollowLocation();
 			return true;
 		case R.id.action_save_track:
-			mGpxTrack.saveGpxTrack(getStorageDirectory());
+			// TODO change saving Gpx log
+			mOverlays.mGpxTrack.saveGpxTrack(getStorageDirectory());
 			return true;
-			// case R.id.action_layers:
-			// return true;
+		case R.id.action_layers:
+			mOverlays.showSelectionDialog();
+			return true;
 			// case R.id.action_my_friends:
 			// return true;
 		case R.id.action_settings:
 			showPreferences();
 			return true;
 		case R.id.action_exit:
-			Intent intent = new Intent(this, LocationService.class);
-			intent.putExtra(LocationService.COMMAND,
-					LocationService.COMMAND_STOP);
-			startService(intent);
+			mRequestExit = true;
 			finish();
 			return true;
 		default:
@@ -207,11 +166,6 @@ public class MainActivity extends Activity implements TrackListener,
 							.getString(R.string.osm_mapnik));
 			mMapView.setTileSource(MyTileSourceFactory.createTileSource(
 					newValue, this.getResources()));
-		}
-		if (key.equals(SettingsActivity.PREF_UPDATE_FOREGROUND)) {
-			long minTime = Long.parseLong(sharedPreferences.getString(
-					SettingsActivity.PREF_UPDATE_FOREGROUND, "60000"));
-			mLocationOverlay.setLocationUpdateMinTime(minTime);
 		}
 	}
 
