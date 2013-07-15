@@ -79,6 +79,8 @@ public class Overlays implements TrackListener,
 		mOverlayItems.add(oItem);
 		mFriendsLocationOverlay = new ItemizedIconOverlay<OverlayItem>(
 				mContext, mOverlayItems, null);
+		
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	public void onResume() {
