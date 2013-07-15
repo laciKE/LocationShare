@@ -45,6 +45,7 @@ public class HttpConnectionManager {
 	}
 
 	public void send(Message message) {
+		Log.d("HTTP send","x");
 		synchronized (mQueue) {
 			mQueue.add(message);
 		}
@@ -52,13 +53,14 @@ public class HttpConnectionManager {
 
 			@Override
 			public void run() {
+				Log.d("HTTP run","x"+mQueue.isEmpty());
 				synchronized (mQueue) {
 					while (!mQueue.isEmpty()) {
 						Message message = mQueue.peek();
 						synchronized (this) {
 							// TODO mUrl							
 						}
-
+						Log.d("HTTP","run");
 						try {
 							HttpClient httpclient = new DefaultHttpClient();
 							HttpPost httppost = new HttpPost(mServer + mSubmitPage);
@@ -79,6 +81,7 @@ public class HttpConnectionManager {
 							//Execute and get the response.
 							HttpResponse response = httpclient.execute(httppost);
 							if (response.getStatusLine().getStatusCode() == 200) {
+								Log.d("HttpConnectionManager","location updated on server");
 								mQueue.poll();
 							}
 							else {
