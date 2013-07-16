@@ -9,6 +9,7 @@ import org.osmdroid.views.MapView;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
@@ -25,6 +26,7 @@ public class MainActivity extends Activity implements
 	private static final String LONGITUDE = "longitude";
 	private static final String ZOOM = "zoom";
 
+	protected Handler mHandler = new Handler();
 	private MapController mMapController;
 	private MapView mMapView;
 	private Overlays mOverlays;
@@ -129,7 +131,7 @@ public class MainActivity extends Activity implements
 			return true;
 		case R.id.action_save_track:
 			// TODO change saving Gpx log
-			mOverlays.mGpxTrack.saveGpxTrack(getStorageDirectory());
+			GpxLogWriter.saveGpxLog(this, mHandler, getStorageDirectory());
 			return true;
 		case R.id.action_layers:
 			mOverlays.showSelectionDialog();
