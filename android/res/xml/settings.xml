@@ -61,7 +61,7 @@
             android:title="@string/livetracking_enable" />
 
         <EditTextPreference
-            android:defaultValue="http://example.com/tracker.php?lat={lat}&amp;lon={lon}&amp;alt={alt}&amp;speed={speed}&amp;timestamp={time}"
+            android:defaultValue="@string/livetracking_url_default"
             android:dependency="pref_livetracking"
             android:key="pref_livetracking_url"
             android:summary="@string/livetracking_url_summary"

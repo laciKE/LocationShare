@@ -28,6 +28,7 @@
     <string name="livetracking_enable">Enable live tracking</string>
     <string name="livetracking_url">URL for live tracking</string>
     <string name="livetracking_url_summary">URL of remote live tracker with available parameters: {lat}, {lon}, {alt}, {speed}, {time}.</string>
+    <string name="livetracking_url_default">http://example.com/tracker.php?lat={lat}&amp;lon={lon}&amp;alt={alt}&amp;speed={speed}&amp;timestamp={time}</string>
     <string name="choose_visible_layers">Choose visible layers</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
