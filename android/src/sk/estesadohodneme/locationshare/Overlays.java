@@ -116,6 +116,11 @@ public class Overlays implements TrackListener,
 		showVisibleOverlays();
 		mLocationOverlay.enableFollowLocation();
 	}
+	
+	public void clearPath(){
+		mPathOverlay.clearPath();
+		SharedLocationStorage.getInstance().clear();
+	}
 
 	public void showVisibleOverlays() {
 		mOverlays.clear();

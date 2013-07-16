@@ -9,6 +9,8 @@
     <string name="my_friends">My friends</string>
     <string name="layers">Layers</string>
     <string name="save_track">Save gpx track</string>
+    <string name="clear_track">Clear track</string>
+    <string name="track_cleared">Track cleared.</string>
     <string name="maps">Maps</string>
     <string name="use_online_maps">Use online maps</string>
     <string name="tile_source">Tile source</string>

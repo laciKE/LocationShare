@@ -18,6 +18,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements
 		OnSharedPreferenceChangeListener {
@@ -130,8 +131,12 @@ public class MainActivity extends Activity implements
 			mOverlays.enableFollowLocation();
 			return true;
 		case R.id.action_save_track:
-			// TODO change saving Gpx log
 			GpxLogWriter.saveGpxLog(this, mHandler, getStorageDirectory());
+			return true;
+		case R.id.action_clear_track:
+			mOverlays.clearPath();
+			Toast.makeText(this, R.string.track_cleared, Toast.LENGTH_SHORT)
+					.show();
 			return true;
 		case R.id.action_layers:
 			mOverlays.showSelectionDialog();
