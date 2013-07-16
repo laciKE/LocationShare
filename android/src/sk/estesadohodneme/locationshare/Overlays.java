@@ -38,7 +38,6 @@ public class Overlays implements TrackListener,
 	private ScaleBarOverlay mScaleBarOverlay;
 	private MyLocationOverlay mCompassOverlay;
 	private ItemizedIconOverlay<OverlayItem> mFriendsLocationOverlay;
-	public GpxTrack mGpxTrack;
 
 	private boolean[] mVisibleOverlays = { false, // My location
 			false, // Friend's locations
@@ -51,7 +50,6 @@ public class Overlays implements TrackListener,
 			SharedPreferences sharedPreferences) {
 		mContext = context;
 		mMapView = mapView;
-		mGpxTrack = new GpxTrack(mContext, mHandler);
 		mOverlays = mMapView.getOverlays();
 		mScaleBarOverlay = new ScaleBarOverlay(mContext);
 
@@ -103,21 +101,25 @@ public class Overlays implements TrackListener,
 		SharedLocationStorage sharedLocationStorage = SharedLocationStorage
 				.getInstance();
 		for (int i = 0; i < sharedLocationStorage.size(); i++) {
-			MyGeoPoint trackPoint = new MyGeoPoint(sharedLocationStorage.get(i));
-			mGpxTrack.add(trackPoint);
+			Location location = sharedLocationStorage.get(i);
+			GeoPoint trackPoint = new GeoPoint(location);
 			mPathOverlay.addPoint(trackPoint);
 		}
 	}
 
 	public void onStop() {
 		mPathOverlay.clearPath();
-		mGpxTrack.clear();
 	}
 
 	public void enableFollowLocation() {
 		mVisibleOverlays[0] = true;
 		showVisibleOverlays();
 		mLocationOverlay.enableFollowLocation();
+	}
+	
+	public void clearPath(){
+		mPathOverlay.clearPath();
+		SharedLocationStorage.getInstance().clear();
 	}
 
 	public void showVisibleOverlays() {
@@ -191,8 +193,7 @@ public class Overlays implements TrackListener,
 
 	@Override
 	public void onNewTrackPoint(Location location) {
-		MyGeoPoint trackPoint = new MyGeoPoint(location);
-		mGpxTrack.add(trackPoint);
+		GeoPoint trackPoint = new GeoPoint(location);
 		mPathOverlay.addPoint(trackPoint);
 	}
 
